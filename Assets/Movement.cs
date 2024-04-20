@@ -23,7 +23,7 @@ public class Movement : MonoBehaviour
         if (MInput.PressSpace())
         {
             if (!_dashingCoroutine.IsNull()) StopCoroutine(_dashingCoroutine);
-            _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 1));
+            _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));
         }
 
     }
@@ -36,7 +36,7 @@ public class Movement : MonoBehaviour
 
         Vector3 startPosition = transform.position;
 
-        while (elapsedTime < duration - 0.85f)
+        while (elapsedTime < duration * 0.15f)
         {
             elapsedTime += Time.deltaTime;
             float normalizedTime = Mathf.Clamp01(elapsedTime / duration);
