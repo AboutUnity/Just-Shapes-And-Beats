@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using YNL.Extension.Method;
@@ -9,34 +10,23 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Movement : MonoBehaviour
 {
-    public float timer = 0;
-    public bool isDashAble = true;
+    public bool _canDash = true;
     public float _speed = 0.05f;
     public float _dashDistance;
     private Vector2 _movingInput;
     [SerializeField] private TrailRenderer tr;
     private Coroutine _dashingCoroutine;
+
     void Update()
     {
         _movingInput = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         transform.position += ToVector3(_movingInput * _speed.Oscillate(120));
-        if (!isDashAble)
+
+        if (MInput.PressSpace() && _canDash)
         {
-            timer += Time.deltaTime;
-            if (timer >= 1.15f)
-            {
-                isDashAble = true;
-                timer = 0;
-            }
-        }
-        if (MInput.PressSpace())
-        {           
-            if (isDashAble)
-            {
-                isDashAble = false;               
-                _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));               
-            }
-            //if (!_dashingCoroutine.IsNull()) StopCoroutine(_dashingCoroutine);
+            _canDash = false;
+            if (!_dashingCoroutine.IsNull()) StopCoroutine(_dashingCoroutine);
+            _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));
         }            
     }
     public Vector3 ToVector3(Vector2 input) => new Vector3(input.x, input.y, 0);
@@ -58,5 +48,9 @@ public class Movement : MonoBehaviour
             yield return null;
         }
         tr.emitting = false;
+
+        // After doing Dash coroutine, wait for 0.5 second
+        yield return new WaitForSeconds(0.5f);
+        _canDash = true;
     }
 }
