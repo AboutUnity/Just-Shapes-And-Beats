@@ -9,6 +9,8 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Movement : MonoBehaviour
 {
+    public float timer = 0;
+    public bool isDashAble = true;
     public float _speed = 0.05f;
     public float _dashDistance;
     private Vector2 _movingInput;
@@ -19,15 +21,25 @@ public class Movement : MonoBehaviour
     {
         _movingInput = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         transform.position += ToVector3(_movingInput * _speed.Oscillate(120));
-
-        if (MInput.PressSpace())
+        if (!isDashAble)
         {
-            if (!_dashingCoroutine.IsNull()) StopCoroutine(_dashingCoroutine);
-            _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));
+            timer += Time.deltaTime;
+            if (timer >= 1.15f)
+            {
+                isDashAble = true;
+                timer = 0;
+            }
         }
-
+        if (MInput.PressSpace())
+        {           
+            if (isDashAble)
+            {
+                isDashAble = false;               
+                _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));               
+            }
+            //if (!_dashingCoroutine.IsNull()) StopCoroutine(_dashingCoroutine);
+        }            
     }
-
     public Vector3 ToVector3(Vector2 input) => new Vector3(input.x, input.y, 0);
 
     public IEnumerator Dashing(Vector2 destination, float duration, TweenType tween = TweenType.ExponentialInterpolation)
