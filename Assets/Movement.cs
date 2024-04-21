@@ -33,8 +33,8 @@ public class Movement : MonoBehaviour
         {           
             if (isDashAble)
             {
-                isDashAble = false;              
-                _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));     
+                isDashAble = false;               
+                _dashingCoroutine = StartCoroutine(Dashing(transform.position + ToVector3(_movingInput.normalized * _dashDistance), 0.75f));               
             }
             //if (!_dashingCoroutine.IsNull()) StopCoroutine(_dashingCoroutine);
         }            
